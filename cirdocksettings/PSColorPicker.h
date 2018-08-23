@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 #import "HRColorPickerView.h"
 #import "HRBrightnessSlider.h"
 

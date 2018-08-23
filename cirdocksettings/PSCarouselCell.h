@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 #import "iCarousel.h"
 
 enum Animations {

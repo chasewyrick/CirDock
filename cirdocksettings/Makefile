@@ -1,17 +1,17 @@
-include theos/makefiles/common.mk
-
-export ARCHS = armv7 arm64
-ADDITIONAL_OBJCFLAGS = -fobjc-arc
+include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = CirDockSettings
-CirDockSettings_FILES = PSCirDockSwitch.mm PSStepperCell.mm ./Tutorial/CirDockHoldTutViewController.m ./Tutorial/CirDockTapTutViewController.m ./Tutorial/Panel.m ./Tutorial/PurchaseViewController.m ./Tutorial/TutViewController.m UIAlertView+Blocks.m NSString+Emojize.m UIImage+CoreGraphics.m HRBrightnessCursor.m HRBrightnessSlider.m HRColorCursor.m HRColorInfoView.m HRColorMapView.m HRColorPickerView.m HRHSVColorUtil.m PSColorPicker.mm PSIECell.mm CirDockFavoritesController.mm CirDockBadgeController.mm CirDockHoldController.mm CirDockApplicationsController.mm PSColoredCell.mm iCarousel.m PSCarouselCell.mm CirDockSettings.mm
+
+export ARCHS = arm64
+CirDockSettings_ARCHS = arm64
+CirDockSettings_CFLAGS = -fobjc-arc
+
+CirDockSettings_FILES = /mnt/d/codes/cirdock/cirdocksettings/PSCirDockSwitch.mm /mnt/d/codes/cirdock/cirdocksettings/PSStepperCell.mm /mnt/d/codes/cirdock/cirdocksettings/Tutorial/CirDockHoldTutViewController.m /mnt/d/codes/cirdock/cirdocksettings/Tutorial/CirDockTapTutViewController.m /mnt/d/codes/cirdock/cirdocksettings/Tutorial/Panel.m /mnt/d/codes/cirdock/cirdocksettings/Tutorial/PurchaseViewController.m /mnt/d/codes/cirdock/cirdocksettings/Tutorial/TutViewController.m /mnt/d/codes/cirdock/cirdocksettings/UIAlertView+Blocks.m /mnt/d/codes/cirdock/cirdocksettings/NSString+Emojize.m /mnt/d/codes/cirdock/cirdocksettings/UIImage+CoreGraphics.m /mnt/d/codes/cirdock/cirdocksettings/HRBrightnessCursor.m /mnt/d/codes/cirdock/cirdocksettings/HRBrightnessSlider.m /mnt/d/codes/cirdock/cirdocksettings/HRColorCursor.m /mnt/d/codes/cirdock/cirdocksettings/HRColorInfoView.m /mnt/d/codes/cirdock/cirdocksettings/HRColorMapView.m /mnt/d/codes/cirdock/cirdocksettings/HRColorPickerView.m /mnt/d/codes/cirdock/cirdocksettings/HRHSVColorUtil.m /mnt/d/codes/cirdock/cirdocksettings/PSColorPicker.mm /mnt/d/codes/cirdock/cirdocksettings/PSIECell.mm /mnt/d/codes/cirdock/cirdocksettings/CirDockFavoritesController.mm /mnt/d/codes/cirdock/cirdocksettings/CirDockBadgeController.mm /mnt/d/codes/cirdock/cirdocksettings/CirDockHoldController.mm /mnt/d/codes/cirdock/cirdocksettings/CirDockApplicationsController.mm /mnt/d/codes/cirdock/cirdocksettings/PSColoredCell.mm /mnt/d/codes/cirdock/cirdocksettings/iCarousel.m /mnt/d/codes/cirdock/cirdocksettings/PSCarouselCell.mm /mnt/d/codes/cirdock/cirdocksettings/CirDockSettings.mm
 CirDockSettings_INSTALL_PATH = /Library/PreferenceBundles
 CirDockSettings_FRAMEWORKS = UIKit QuartzCore CoreGraphics Accounts Social MessageUI
 CirDockSettings_PRIVATE_FRAMEWORKS = Preferences
 CirDockSettings_LIBRARIES = applist
 
-include $(THEOS_MAKE_PATH)/bundle.mk
 
-internal-stage::
-	$(ECHO_NOTHING)mkdir -p $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences$(ECHO_END)
-	$(ECHO_NOTHING)cp entry.plist $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/CirDockSettings.plist$(ECHO_END)
+
+include $(THEOS_MAKE_PATH)/bundle.mk

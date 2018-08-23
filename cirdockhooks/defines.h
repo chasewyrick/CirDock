@@ -78,9 +78,15 @@
 -(int)_indexOfIconListForIcon:(id)icon;
 @end
 
+@interface SBIconViewMap : NSObject
++(SBIconViewMap *)homescreenMap;
+-(SBIconModel *)iconModel;
+@end
+
 @interface SBIconController : UIViewController
+@property (nonatomic,readonly) SBIconViewMap * homescreenIconViewMap; 
 +(SBIconController*)sharedInstance;
--(void)_launchIcon:(id)icon;
+-(void)_launchFromIconView:(id)arg1;
 -(SBIconModel *)model;
 -(void)addNewIconToDesignatedLocation:(id)designatedLocation animate:(BOOL)animate scrollToList:(BOOL)list saveIconState:(BOOL)state;
 -(void)addNewIconsToDesignatedLocations:(id)designatedLocations saveIconState:(BOOL)state;
@@ -140,10 +146,7 @@
 - (void)_handleSecondHalfLongPressTimer:(id)arg1;
 @end
 
-@interface SBIconViewMap : NSObject
-+(SBIconViewMap *)homescreenMap;
--(SBIconModel *)iconModel;
-@end
+
 
 @interface SpringBoard : NSObject
 -(UIInterfaceOrientation)activeInterfaceOrientation;
@@ -162,6 +165,7 @@
 
 @interface FBProcess : NSObject
 @property (nonatomic, retain) FBApplicationInfo *applicationInfo;
+@property (nonatomic,copy,readonly) NSString * bundleIdentifier; 
 @end
 
 @interface SBRootFolderView : UIView

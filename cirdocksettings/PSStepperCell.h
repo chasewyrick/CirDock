@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 
 #define stepperSpaceFromSides 16
 #define stepperSpaceFromSides2 8

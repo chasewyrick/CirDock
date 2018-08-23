@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 #define BadgePLISTPATH @"/var/mobile/Library/Preferences/com.braveheart.cirdock.plist"
 
 @interface CirDockBadgeController: PSListController {

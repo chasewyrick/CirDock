@@ -13,7 +13,7 @@
 }
 */
 
--(id)initWithStyle:(int)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)spec {
+-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)spec {
 
 	//call the super class's method to create the switch cell
 	self = [super initWithStyle:style reuseIdentifier:identifier specifier:spec]; 

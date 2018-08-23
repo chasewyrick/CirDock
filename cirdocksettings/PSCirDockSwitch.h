@@ -1,13 +1,14 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 
 @class UIActivityIndicatorView;
 
-@interface PSSwitchTableCell : PSControlTableCell {
+
+@interface PSSwitchTableCell () {
     
     UIActivityIndicatorView* _activityIndicator;
     
 }
-
+@property (nonatomic, retain) UISwitch * control;
 -(void)setLoading:(BOOL)arg1 ;
 -(BOOL)loading;
 -(void)dealloc;

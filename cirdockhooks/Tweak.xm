@@ -140,7 +140,7 @@ void BadgeChangedCallback(CFNotificationCenterRef center,void *observer,CFString
         
         // Getting correctly sized image
         SBIcon *icon;
-        SBIconModel *iconModel = (SBIconModel *)([objc_getClass("SBIconViewMap") instancesRespondToSelector:@selector(iconModel)] ? [((SBIconViewMap *)[objc_getClass("SBIconViewMap") homescreenMap]) iconModel] : [objc_getClass("SBIconModel") sharedInstance]);
+        SBIconModel *iconModel = (SBIconModel *)[[(SBIconController*)[objc_getClass("SBIconController") sharedInstance] homescreenIconViewMap] iconModel];
         if ([iconModel respondsToSelector:@selector(applicationIconForDisplayIdentifier:)])
             icon = [iconModel applicationIconForDisplayIdentifier:displayIdentifier];
         else if ([iconModel respondsToSelector:@selector(applicationIconForBundleIdentifier:)])
@@ -522,7 +522,7 @@ enum Animations {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PLISTPATH];
         if(dict)
         {
-            items = [[dict objectForKey:@"enabledApps"] mutableCopy];
+            items = [[dict objectForKey:@"enabledApps"]?:@[] mutableCopy];
         }
         origItems = items;
         anim = NoAnim;
@@ -640,18 +640,14 @@ enum Animations {
     
     UIView *itemView = carouselInput.currentItemView;
     float animDuration = 0.3f;
-    if(anim == Pulsate)
-    {
-        [UIView animateWithDuration:animDuration/2 animations: ^()
-         {
-             itemView.alpha = 0.2f;
-         } completion:^(BOOL finished)
-         {
-             [UIView animateWithDuration:animDuration/2 animations: ^()
-              {
-                  itemView.alpha = 1.0f;
-              } completion:nil];
-         }];
+    if(anim == Pulsate) {
+        [UIView animateWithDuration:animDuration/2 animations: ^(){
+			itemView.alpha = 0.2f;
+		} completion:^(BOOL finished){
+			[UIView animateWithDuration:animDuration/2 animations: ^(){
+				itemView.alpha = 1.0f;
+			} completion:nil];
+		}];
         return;
     }
     
@@ -909,10 +905,7 @@ enum Animations {
     if([[carouselInput itemViewAtIndex:index] isKindOfClass:[objc_getClass("SBIconView") class]])
     {
         SBIconView *iconView = (SBIconView*)[carouselInput itemViewAtIndex:index];
-        SBApplicationIcon *appIcon = iconView.icon;
-        
-        [(SBIconController*)[objc_getClass("SBIconController") sharedInstance]_launchIcon:appIcon];
-        //[(SBUIController*)[objc_getClass("SBUIController") sharedInstance]launchIcon:appIcon fromLocation:0];
+        [(SBIconController*)[objc_getClass("SBIconController") sharedInstance] _launchFromIconView:iconView];
         
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:PLISTPATH];
         if(dict)
@@ -928,14 +921,9 @@ enum Animations {
                 }
             }
         }
-        
-        /*
-         int location = (kCFCoreFoundationVersionNumber >= 847.20)?2:1; //IOS > 7 or not?
-         SBApplication *application = [appIcon application];
-         [application icon:appIcon launchFromLocation:location];
-         */
     }
 }
+
 
 - (void)carousel:(iCarousel *)inputCarousel didHoldItemAtIndex:(NSInteger)index
 {
@@ -1016,7 +1004,7 @@ enum Animations {
                 
                 SBApplicationController *controller = (SBApplicationController*)[SBApplicationControllerClass sharedInstanceIfExists];
                 
-                NSMutableArray *bannerItems = [[NSMutableArray alloc] init];
+                NSMutableArray *bannerItems = [@[] mutableCopy];
                 
                 NSMutableArray *allApps;
                 NSMutableDictionary *dict = [[NSDictionary dictionaryWithContentsOfFile:PLISTPATH] mutableCopy];
@@ -1028,7 +1016,7 @@ enum Animations {
                 
                 if(allApps == nil)
                 {
-                    allApps = [[NSMutableArray alloc] init];
+                    allApps = [@[] mutableCopy];
                     for(NSString *identifier in origItems)
                     {
                         SBApplication *app = (controller == nil)?nil:(([controller respondsToSelector:@selector(applicationWithDisplayIdentifier:)])?[controller applicationWithDisplayIdentifier:identifier]:[controller applicationWithBundleIdentifier:identifier]);
@@ -1058,7 +1046,7 @@ enum Animations {
                 
                 SBApplicationController *controller = (SBApplicationController*)[SBApplicationControllerClass sharedInstanceIfExists];
                 
-                NSMutableArray *bannerItems = [[NSMutableArray alloc] init];
+                NSMutableArray *bannerItems = [@[] mutableCopy];
                 
                 NSMutableArray *allApps;
                 NSMutableDictionary *dict = [[NSDictionary dictionaryWithContentsOfFile:PLISTPATH] mutableCopy];
@@ -1070,7 +1058,7 @@ enum Animations {
                 
                 if(allApps == nil)
                 {
-                    allApps = [[NSMutableArray alloc] init];
+                    allApps = [@[] mutableCopy];
                     for(NSString *identifier in origItems)
                     {
                         SBApplication *app = (controller == nil)?nil:(([controller respondsToSelector:@selector(applicationWithDisplayIdentifier:)])?[controller applicationWithDisplayIdentifier:identifier]:[controller applicationWithBundleIdentifier:identifier]);
@@ -1254,7 +1242,7 @@ enum Animations {
 -(void)_layoutSubviews
 {
     %orig;
-    
+    rootFolderView = self;
     dock = MSHookIvar<SBDockView*>(self, "_dockView");
 }
 
@@ -1266,17 +1254,18 @@ enum Animations {
 }
 %end
 
-%hook SBWorkspace
+%hook SBMainWorkspace
 
--(void)applicationProcessDidExit:(FBProcess *)applicationProcess withContext:(id)context {
+-(void)applicationProcessDidExit:(FBProcess *)applicationProcess withContext:(id)context
+{
     if (runningApplications == nil) {
-        runningApplications = [[NSMutableArray alloc] init];
+        runningApplications = [@[] mutableCopy];
         
         %orig;
         return;
     }
-    if ([runningApplications containsObject:applicationProcess.applicationInfo.bundleIdentifier]) {
-        [runningApplications removeObject:applicationProcess.applicationInfo.bundleIdentifier];
+    if ([runningApplications containsObject:applicationProcess.bundleIdentifier]) {
+        [runningApplications removeObject:applicationProcess.bundleIdentifier];
     }
     
     Class SBApplicationControllerClass = objc_getClass("SBApplicationController");
@@ -1288,11 +1277,12 @@ enum Animations {
     %orig;
 }
 
--(void)applicationProcessDidLaunch:(FBProcess *)applicationProcess {
+-(void)applicationProcessDidLaunch:(FBProcess *)applicationProcess
+{
     if (runningApplications == nil) {
-        runningApplications = [[NSMutableArray alloc] init];
+        runningApplications = [@[] mutableCopy];
     }
-    [runningApplications addObject:applicationProcess.applicationInfo.bundleIdentifier];
+    [runningApplications addObject:applicationProcess.bundleIdentifier];
     
     Class SBApplicationControllerClass = objc_getClass("SBApplicationController");
     if([SBApplicationControllerClass sharedInstanceIfExists])
@@ -1402,6 +1392,12 @@ void DockChangedNotificationTweak(CFNotificationCenterRef center,void *observer,
 
 #pragma mark Cirdock Late Init Code
 
+static void orientationChanged()
+{
+	CirDock *cirDock = [CirDock sharedInstance];
+	[cirDock timerFired];
+}
+
 void runCirDock(CFNotificationCenterRef center,void *observer,CFStringRef name,const void *object,CFDictionaryRef userInfo)
 {
     if(name == (__bridge CFStringRef)UIApplicationDidFinishLaunchingNotification)
@@ -1486,9 +1482,10 @@ void runCirDock(CFNotificationCenterRef center,void *observer,CFStringRef name,c
         CFNotificationCenterAddObserver ( centre, NULL, BadgeChangedCallback, (__bridge CFStringRef)@"CirDockBadgeChangeNotification", NULL, NO );
         CFNotificationCenterAddObserver ( centre, NULL, ColorChangedCallback, (__bridge CFStringRef)@"CirDockColorChangeNotification", NULL, NO );
         CFNotificationCenterAddObserver ( centre, NULL, DockChangedNotificationTweak, (__bridge CFStringRef)@"CirDockDockChangedNotification", NULL, NO );
-        
+        CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(), NULL, (CFNotificationCallback)&orientationChanged, CFSTR("UIWindowDidRotateNotification"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+		
         // Setting Up Timer
-        [NSTimer scheduledTimerWithTimeInterval:2 target:cirDock selector:@selector(timerFired) userInfo:nil repeats:YES];
+        //[NSTimer scheduledTimerWithTimeInterval:2 target:cirDock selector:@selector(timerFired) userInfo:nil repeats:YES];
     }
 }
 
@@ -1511,7 +1508,7 @@ void runCirDock(CFNotificationCenterRef center,void *observer,CFStringRef name,c
     [[objc_getClass("ISIconSupport") sharedInstance] addExtension:@"CirDock"];
     
     // Initialize CirDock.
-    runningApplications = [[NSMutableArray alloc]init];
+    runningApplications = [@[] mutableCopy];
     
     if([[NSFileManager defaultManager]fileExistsAtPath:FIRSTRUNPATH]) // && passed)
     {

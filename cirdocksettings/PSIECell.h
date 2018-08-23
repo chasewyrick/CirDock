@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 
 @interface PSIECell : PSTableCell
 @property (nonatomic, retain) UIButton *importBtn, *exportBtn;

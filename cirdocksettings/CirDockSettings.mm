@@ -1,4 +1,4 @@
-#import <Preferences/Preferences.h>
+#import <prefs.h>
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
 #import <MessageUI/MessageUI.h>
@@ -13,7 +13,6 @@
 #define FIRSTRUNPATHSETTINGS @"/var/mobile/Library/CirDockFirstRun"
 
 @interface PSListController()
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion;
 - (void)viewDidLayoutSubviews;
 @end
@@ -136,14 +135,11 @@
         imgView.frame = CGRectMake(0, 0, 29, 29);
         ((UINavigationItem*)self.navigationItem).titleView = imgView;
         
-        imgData = [[NSData alloc] initWithContentsOfFile:@"/Library/PreferenceBundles/CirDockSettings.bundle/Heart.png"];
-        UIImage *image = [[UIImage alloc] initWithData:imgData];
-        heart = [UIButton buttonWithType:UIButtonTypeCustom];
-        heart.bounds = CGRectMake( 0, 0, image.size.width, image.size.height );
-        [heart setImage:image forState:UIControlStateNormal];
-        [heart addTarget:self action:@selector(heartPressed) forControlEvents:UIControlEventTouchUpInside];
-        heart.frame = CGRectMake(0, 0, 29, 29);
-        ((UINavigationItem*)self.navigationItem).rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:heart];
+		heart = [[UIButton alloc] initWithFrame:CGRectZero];
+		[heart setImage:[[UIImage alloc] initWithContentsOfFile:[[self bundle] pathForResource:@"Heart" ofType:@"png"]] forState:UIControlStateNormal];
+		[heart sizeToFit];
+		[heart addTarget:self action:@selector(heartPressed) forControlEvents:UIControlEventTouchUpInside];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:heart];
     }
     return self;
 }
